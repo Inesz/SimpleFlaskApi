@@ -29,7 +29,7 @@ def create_app(test_config=None):
         return 'Hello, World!'
 
     @app.route('/tell-me-sth', methods=[HttpMethod.GET.value, HttpMethod.POST.value])
-    def update_text():
+    def tell_me_sth():
         method = request.method
         body = request.data
         resp = "{}"
