@@ -4,6 +4,7 @@ import os
 from flask import Flask, jsonify, request
 
 from flaskr.constants import HttpMethod
+from flaskr.err_handler import default_err_handler, default_werkzeug_handler
 
 
 def create_app(test_config=None):
@@ -18,6 +19,9 @@ def create_app(test_config=None):
         app.config.from_pyfile('config.py', silent=True)
     else:
         app.config.from_mapping(test_config)
+
+    app.register_error_handler(Exception, default_err_handler)
+    app.register_error_handler(Exception, default_werkzeug_handler)
 
     try:
         os.makedirs(app.instance_path)
