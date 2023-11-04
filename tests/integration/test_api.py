@@ -1,10 +1,14 @@
+import json
+
 import pytest
 
-from flaskr import create_app
+from flaskr import create_app, SomeInput
+from flaskr.api_input import Gender
 
 app = create_app()
 
 TELL_ME_STH = '/tell-me-sth'
+VALIDATION = '/validation'
 def test_hello():
     response = app.test_client().get('/hello')
 
@@ -36,3 +40,14 @@ def test_tell_me_sth_err():
 
     assert out.status_code == 405
     assert out.data.decode('utf-8') == '{"code":"The method is not allowed for the requested URL.","str":405}\n'
+
+
+def test_validation():
+    body = SomeInput(name="abc", age=19, acceptance=False, gender=Gender.F, preferences="yellow")
+    json_body = json.dumps(body.__dict__)
+
+    with app.app_context():
+        out = app.test_client().post(VALIDATION, data=json_body, mimetype="application/json")
+
+    assert out.status_code == 200
+    assert out.data.decode('utf-8')[2:-3] == json_body[2:-2].replace(" ", "")
