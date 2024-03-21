@@ -6,10 +6,12 @@ from flask import Flask, jsonify, request
 from flask_pydantic.exceptions import ValidationError
 
 from flaskr import api_input
-from flaskr.api_input import SomeInput
+from flaskr.api_input import SomeInput, Gender
 from flaskr.constants import HttpMethod
 from flaskr.err_handler import default_err_handler, default_werkzeug_handler, default_validation_handler
 from flask_pydantic import validate
+
+from flaskr.serializable_base_model import SomeOutput
 
 
 def create_app(test_config=None):
@@ -40,6 +42,16 @@ def create_app(test_config=None):
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
+
+    @app.route('/give-serialized/<age>')
+    def give_serialized(age):
+        out = SomeOutput(name = "abc",
+        age = age,
+        acceptance = True,
+        gender = Gender.F,
+        preferences = "yellow")
+
+        return jsonify(out.to_dict())
 
     @app.route('/tell-me-sth', methods=[HttpMethod.GET.value, HttpMethod.POST.value])
     def tell_me_sth():

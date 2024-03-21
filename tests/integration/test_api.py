@@ -1,5 +1,3 @@
-import json
-
 import pytest
 
 from flaskr import create_app, SomeInput
@@ -44,10 +42,17 @@ def test_tell_me_sth_err():
 
 def test_validation():
     body = SomeInput(name="abc", age=19, acceptance=False, gender=Gender.F, preferences="yellow")
-    json_body = json.dumps(body.__dict__)
+    json_body = body.model_dump_json()
 
     with app.app_context():
         out = app.test_client().post(VALIDATION, data=json_body, mimetype="application/json")
 
     assert out.status_code == 200
     assert out.data.decode('utf-8')[2:-3] == json_body[2:-2].replace(" ", "")
+
+def test_give():
+    response = app.test_client().get('/give-serialized/123')
+
+    assert response.status_code == 200
+    assert response.data.decode('utf-8') == '{"name":"abc","age":123,"accepted":true,"option":null,"gender":"f","preferences":"yellow"}\n'
+
